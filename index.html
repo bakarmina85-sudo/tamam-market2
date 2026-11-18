@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تمام ماركت - هدوم لكل العيلة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f4;--card:#ffffff;--ink:#17212b;--mute:#5b6773;--brand:#0f4c4a;--on-brand:#ffffff;--accent:#f2b632;--line:#d8dee4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171d;--card:#1a232b;--ink:#eef2f5;--mute:#9aa7b3;--brand:#4fb3ad;--on-brand:#0a1a19;--line:#2a3640;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Cairo,Tahoma,Arial,sans-serif;line-height:1.6}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 5vw}
+.logo{font-weight:800;font-size:1.5rem}
+.logo span{background:var(--accent);color:#17212b;padding:0 8px;border-radius:6px;margin-inline-start:6px}
+.cartbtn{background:var(--accent);color:#17212b;border:0;border-radius:999px;padding:8px 16px;font-weight:800}
+.hero{padding:44px 5vw 28px;max-width:1100px;margin:auto}
+.hero h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.2;margin:0 0 10px;font-weight:800}
+.hero p{color:var(--mute);margin:0;max-width:52ch;font-size:1.1rem}
+.tools{max-width:1100px;margin:auto;padding:12px 5vw;display:flex;flex-wrap:wrap;gap:10px}
+.tools input{flex:1 1 220px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 16px;border-radius:999px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+main{max-width:1100px;margin:auto;padding:8px 5vw 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pic{height:170px;display:grid;place-items:center;font-size:4.5rem}
+.info{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.info h3{margin:0;font-size:1.05rem}
+.cat{color:var(--mute);font-size:.9rem}
+.price{font-weight:800;font-size:1.15rem;margin-top:auto}
+.add{margin-top:8px;background:var(--brand);color:var(--on-brand);border:0;border-radius:10px;padding:9px;font-weight:600}
+.empty{text-align:center;color:var(--mute);padding:40px 0}
+aside{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(380px,100%);background:var(--card);border-inline-end:1px solid var(--line);z-index:10;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+aside.open{transform:none}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row b{flex:1}
+.qty button{width:28px;height:28px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px}
+.items{flex:1;overflow:auto}
+.total{display:flex;justify-content:space-between;font-weight:800;font-size:1.2rem;padding:12px 0}
+.go{background:var(--accent);color:#17212b;border:0;border-radius:10px;padding:12px;font-weight:800;font-size:1rem}
+.close{align-self:flex-start;background:none;border:0;color:var(--ink);font-size:1.6rem}
+.msg{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 20px;border-radius:10px;z-index:20;display:none}
+footer{text-align:center;color:var(--mute);padding:24px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">تمام<span>ماركت</span></div>
+  <button class="cartbtn" id="openCart">السلة (<span id="count">0</span>)</button>
+</header>
+
+<section class="hero">
+  <h1>هدوم حلوة بسعر تمام</h1>
+  <p>رجالي وحريمي وأطفال. اختار اللي يعجبك، ضيفه للسلة، واطلب في دقيقة.</p>
+</section>
+
+<div class="tools">
+  <input id="q" type="search" placeholder="دور على قطعة... مثلاً: جاكيت" aria-label="بحث">
+  <div class="chips" id="chips"></div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>مفيش منتجات بالاسم ده. جرب كلمة تانية.</div>
+</main>
+
+<footer>تمام ماركت - مشروع كلية © 2026</footer>
+
+<aside id="cart" aria-label="سلة المشتريات">
+  <button class="close" id="closeCart" aria-label="إغلاق">×</button>
+  <h2 style="margin:0">سلتك</h2>
+  <div class="items" id="items"></div>
+  <div class="total"><span>الإجمالي</span><span id="total">0 ج.م</span></div>
+  <button class="go" id="checkout">تأكيد الطلب</button>
+</aside>
+<div class="msg" id="msg" role="status"></div>
+
+<script>
+// 1) بيانات المنتجات: عدّل هنا عشان تغيّر أو تضيف منتجات
+const products = [
+  {id:1,name:"تيشيرت قطن أبيض",cat:"رجالي",price:250,icon:"👕",bg:"#dbe9f4"},
+  {id:2,name:"جاكيت جينز",cat:"رجالي",price:750,icon:"🧥",bg:"#c9d6e8"},
+  {id:3,name:"بنطلون كلاسيك",cat:"رجالي",price:520,icon:"👖",bg:"#d9d6ee"},
+  {id:4,name:"فستان صيفي",cat:"حريمي",price:680,icon:"👗",bg:"#f6d9e0"},
+  {id:5,name:"طرحة حرير",cat:"حريمي",price:180,icon:"🧣",bg:"#f4e3c3"},
+  {id:6,name:"بلوزة كاجوال",cat:"حريمي",price:390,icon:"👚",bg:"#d7ecd9"},
+  {id:7,name:"طقم أطفال قطن",cat:"أطفال",price:310,icon:"🧒",bg:"#fbe6b8"},
+  {id:8,name:"شنطة مدرسة",cat:"أطفال",price:420,icon:"🎒",bg:"#cfe8e6"},
+  {id:9,name:"كاب رياضي",cat:"إكسسوارات",price:120,icon:"🧢",bg:"#e6d4d4"},
+  {id:10,name:"جزمة سنيكرز",cat:"إكسسوارات",price:890,icon:"👟",bg:"#dfe3e8"}
+];
+const cats = ["الكل","رجالي","حريمي","أطفال","إكسسوارات"];
+
+// 2) الحالة: اللي بيتغير وإحنا شغالين
+let cat = "الكل", query = "", cart = {};
+
+const $ = id => document.getElementById(id);
+const money = n => n.toLocaleString("ar-EG") + " ج.م";
+
+// 3) رسم التصنيفات
+function drawChips(){
+  $("chips").innerHTML = "";
+  cats.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = c;
+    b.setAttribute("aria-pressed", c === cat);
+    b.onclick = () => { cat = c; drawChips(); drawGrid(); };
+    $("chips").appendChild(b);
+  });
+}
+
+// 4) رسم المنتجات حسب البحث والتصنيف
+function drawGrid(){
+  const list = products.filter(p =>
+    (cat === "الكل" || p.cat === cat) && p.name.includes(query.trim()));
+  $("grid").innerHTML = list.map(p => `
+    <article class="card">
+      <div class="pic" style="background:${p.bg}">${p.icon}</div>
+      <div class="info">
+        <h3>${p.name}</h3><span class="cat">${p.cat}</span>
+        <span class="price">${money(p.price)}</span>
+        <button class="add" onclick="add(${p.id})">أضف للسلة</button>
+      </div>
+    </article>`).join("");
+  $("empty").hidden = list.length > 0;
+}
+
+// 5) السلة
+function add(id){ cart[id] = (cart[id] || 0) + 1; drawCart(); toast("اتضافت للسلة"); }
+function change(id, d){ cart[id] += d; if (cart[id] <= 0) delete cart[id]; drawCart(); }
+function drawCart(){
+  const ids = Object.keys(cart);
+  let total = 0, count = 0;
+  $("items").innerHTML = ids.length ? ids.map(id => {
+    const p = products.find(x => x.id == id), q = cart[id];
+    total += p.price * q; count += q;
+    return `<div class="row"><span style="font-size:1.8rem">${p.icon}</span>
+      <b>${p.name}<br><small>${money(p.price)}</small></b>
+      <span class="qty"><button onclick="change(${id},-1)" aria-label="نقص">−</button>
+      <span> ${q} </span><button onclick="change(${id},1)" aria-label="زوّد">+</button></span></div>`;
+  }).join("") : '<p class="empty">السلة فاضية.</p>';
+  $("total").textContent = money(total);
+  $("count").textContent = count.toLocaleString("ar-EG");
+}
+
+function toast(t){
+  const m = $("msg"); m.textContent = t; m.style.display = "block";
+  clearTimeout(toast.t); toast.t = setTimeout(() => m.style.display = "none", 1800);
+}
+
+// 6) الأزرار
+$("q").oninput = e => { query = e.target.value; drawGrid(); };
+$("openCart").onclick = () => $("cart").classList.add("open");
+$("closeCart").onclick = () => $("cart").classList.remove("open");
+$("checkout").onclick = () => {
+  if (!Object.keys(cart).length) return toast("السلة فاضية");
+  cart = {}; drawCart(); $("cart").classList.remove("open");
+  toast("تم تأكيد طلبك، شكراً ليك!");
+};
+
+drawChips(); drawGrid(); drawCart();
+</script>
+</body>
+</html>
